@@ -22,7 +22,7 @@ public class BusGenerator extends Thread {
     public void run() {
         int currentBusID = 1;
 
-        while(true) {
+        while(!Thread.currentThread().isInterrupted()) {
             // create and start a new bus thread
             Bus bus = new Bus(currentBusID, busCapacity);
             bus.setStation(station);
@@ -30,7 +30,11 @@ public class BusGenerator extends Thread {
 
             // wait for inter arrival time
             long nextBusWaitTime = calculateArrivalTime();
-            System.out.println("********** Next bus will be in " + nextBusWaitTime/1000 + " seconds **********");
+            if(nextBusWaitTime > 60000) {
+                System.out.println("********** Next bus will be in " + nextBusWaitTime/(1000*60) + " minutes **********");
+            } else {
+                System.out.println("********** Next bus will be in " + nextBusWaitTime/1000 + " seconds **********");
+            }
 
             try {
                 Thread.sleep(nextBusWaitTime);

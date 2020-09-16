@@ -20,7 +20,7 @@ public class PassengerGenerator extends Thread {
     public void run() {
         int currentPassengerID = 1;
 
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             // create and start a new passenger thread
             Passenger passenger = new Passenger(currentPassengerID, station);
             passenger.start();

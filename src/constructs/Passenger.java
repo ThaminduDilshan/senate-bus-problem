@@ -15,7 +15,7 @@ public class Passenger extends Thread {
     }
 
     public void arrive(Station station) {
-        System.out.println("[PASSENGER] Passenger #" + passengerID + " arrived.");
+        System.out.println("\u001B[33m[PASSENGER]\u001B[0m Passenger #" + passengerID + " arrived.");
 
         // will be blocked if a bus is boarded
         station.getBoardMutex().acquireUninterruptibly();
@@ -28,7 +28,7 @@ public class Passenger extends Thread {
         station.incrementPassengerCount();
 
         // wait for the bus to arrive
-        // System.out.println("[PASSENGER] Passenger #" + passengerID + " waiting for the bus...");
+        // System.out.println("\u001B[33m[PASSENGER]\u001B[0m Passenger #" + passengerID + " waiting for the bus...");
         station.getBusMutex().acquireUninterruptibly();
 
         // board to the bus
@@ -46,7 +46,7 @@ public class Passenger extends Thread {
         Bus tempBus = station.getCurrentBus();
         station.decrementPassengerCount();
         tempBus.incrementPassengerCount();
-        System.out.println("[PASSENGER] Passenger #" + passengerID + " boarded to bus #" + tempBus.getBusID());
+        System.out.println("\u001B[32m[PASSENGER]\u001B[0m Passenger #" + passengerID + " boarded to bus #" + tempBus.getBusID());
     }
 
 }
