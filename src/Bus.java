@@ -32,7 +32,7 @@ public class Bus extends Thread {
     }
 
     public void operate(Station station) {
-        station.getPassengerMutex().acquireUninterruptibly();
+        station.getBoardMutex().acquireUninterruptibly();
 
         System.out.println("Bus #" + busID + " arrived at the station!");
         station.setCurrentBus(this);
@@ -42,7 +42,7 @@ public class Bus extends Thread {
             station.getDoorLock().acquireUninterruptibly();
         }
 
-        station.getPassengerMutex().release();
+        station.getBoardMutex().release();
         depart(station);
 
     }

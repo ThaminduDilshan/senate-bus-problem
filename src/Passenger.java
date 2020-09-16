@@ -22,15 +22,18 @@ public class Passenger extends Thread {
     public void arrive(Station station) {
         System.out.println("Passenger #" + passengerID + " arrived.");
 
+        // will be blocked if a bus is boarded
+        station.getBoardMutex().acquireUninterruptibly();
+        station.getBoardMutex().release();
+
         // try to board to the next bus. Blocked if more than busCapacity number of passengers are waiting
         station.getBoardNextBusSemaphore().acquireUninterruptibly();
 
         // move into the station
         station.incrementPassengerCount();
-        System.out.println("Test: Passenger #" + passengerID + " station.passengerCount: " + station.getPassengerCount());
 
         // wait for the bus to arrive
-        System.out.println("Passenger #" + passengerID + " waiting for the bus...");
+//        System.out.println("Passenger #" + passengerID + " waiting for the bus...");
         station.getBusMutex().acquireUninterruptibly();
 
         // board to the bus
@@ -48,9 +51,7 @@ public class Passenger extends Thread {
         Bus tempBus = station.getCurrentBus();
         station.decrementPassengerCount();
         tempBus.incrementPassengerCount();
-
         System.out.println("Passenger #" + passengerID + " boarded to bus #" + tempBus.getBusID());
-
     }
 
 }
