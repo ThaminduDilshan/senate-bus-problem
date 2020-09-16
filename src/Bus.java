@@ -1,10 +1,11 @@
 import java.util.concurrent.Semaphore;
 
-public class Bus {
+public class Bus extends Thread {
     private int busID;
     private int capacity;
     private int passengerCount;
     private Semaphore passengerCountMutex;
+    private Station station;
 
     public Bus(int busID, int capacity) {
         this.busID = busID;
@@ -13,45 +14,49 @@ public class Bus {
         passengerCountMutex = new Semaphore(1);
     }
 
-    public void arrive(Station station) {
-        System.out.println("Bus #" + busID + " arrived at the station!");
-        passengerCountMutex.acquireUninterruptibly();
-        passengerCount = 0;
-        passengerCountMutex.release();
+    @Override
+    public void run() {
+        while(true) {
+            if(station == null) {
+                System.out.println("No station found for the bus #" + busID);
+                break;
+            }
+            operate(station);
 
-        // block the boarding
-        station.getBoardLock().acquireUninterruptibly();
-        System.out.println("Board Lock acquired!");
-        station.setCurrentBus(this);
-
-        // depart if no passengers are at the station
-        if(station.getPassengerCount() == 0) {
-            depart(station);
-        } else {
-            // notify the bus has arrived
-            station.setBusArrived(true);
-
-            // depart if bus is full or no more passengers to get in
-            while(true) {
-                if(passengerCount == capacity || station.getPassengerCount() == 0) {
-                    depart(station);
-                    break;
-                }
+            try {
+                sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
+    }
+
+    public void operate(Station station) {
+        station.getPassengerMutex().acquireUninterruptibly();
+
+        System.out.println("Bus #" + busID + " arrived at the station!");
+        station.setCurrentBus(this);
+
+        if(station.getPassengerCount() != 0) {
+            station.getBusMutex().release();
+            station.getDoorLock().acquireUninterruptibly();
+        }
+
+        station.getPassengerMutex().release();
+        depart(station);
 
     }
 
     public void depart(Station station) {
-        station.setCurrentBus(null);
-        station.getBoardNextBusSemaphore().release(passengerCount);
-        station.getBoardLock().release();
-        System.out.println("Board Lock released!");
         System.out.println("Bus #" + busID + " departed with " + passengerCount + " Passengers!");
     }
 
     public int getBusID() {
         return busID;
+    }
+
+    public void setStation(Station station) {
+        this.station = station;
     }
 
     public void incrementPassengerCount() {

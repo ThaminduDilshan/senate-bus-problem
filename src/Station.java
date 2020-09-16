@@ -2,43 +2,70 @@ import java.util.concurrent.Semaphore;
 
 public class Station {
     private int stationID;
-    private Semaphore boardLock;        // block new passengers boarding, if a bus is already boarding
-    private Semaphore boardNextBusSemaphore;
+    private Semaphore boardNextBusSemaphore;        // passengers for the next bus
+    private Semaphore doorLock;        //
+    private Semaphore busMutex;         // wait passengers until a bus arrives
 
-    private boolean busArrived;
-    private Semaphore busArrivedMutex;
-
-    private Semaphore passengerLock;        // passengerLock is used to modify the passengerCount
     private int passengerCount;
+    private Semaphore passengerMutex;       // block new passengers entering waiting area, if the bus arrived
+
     private Bus currentBus;
 
     public Station(int stationID, int busCapacity) {
         this.stationID = stationID;
-        boardLock = new Semaphore(1);
         boardNextBusSemaphore = new Semaphore(busCapacity, true);
-        busArrived = false;
-        busArrivedMutex = new Semaphore(1);
-        passengerLock = new Semaphore(1);
-        passengerCount = 0;
-        currentBus = null;
-    }
 
-    public Semaphore getBoardLock() {
-        return boardLock;
+        busMutex = new Semaphore(0, true);
+
+        passengerCount = 0;
+        passengerMutex = new Semaphore(1);
+//        passengerLock = new ReentrantReadWriteLock();
+//        passengerReadLock = passengerLock.readLock();
+//        passengerWriteLock = passengerLock.writeLock();
+
+        doorLock = new Semaphore(0, true);
+        currentBus = null;
     }
 
     public Semaphore getBoardNextBusSemaphore() {
         return boardNextBusSemaphore;
     }
 
-    public boolean isBusArrived() {
-        return busArrived;
+
+    public Semaphore getBusMutex() {
+        return busMutex;
     }
 
-    public void setBusArrived(boolean busArrived) {
-        busArrivedMutex.acquireUninterruptibly();
-        this.busArrived = busArrived;
-        busArrivedMutex.release();
+    public int getPassengerCount() {
+//        passengerReadLock.lock();
+//        int temp = passengerCount;
+//        passengerReadLock.unlock();
+//        return temp;
+        return passengerCount;
+    }
+
+    public void decrementPassengerCount() {
+//        passengerWriteLock.lock();
+//        passengerMutex.acquireUninterruptibly();
+        passengerCount -= 1;
+//        passengerWriteLock.unlock();
+//        passengerMutex.release();
+    }
+
+    public void incrementPassengerCount() {
+//        passengerWriteLock.lock();
+//        passengerMutex.acquireUninterruptibly();
+        passengerCount += 1;
+//        passengerWriteLock.unlock();
+//        passengerMutex.release();
+    }
+
+    public Semaphore getPassengerMutex() {
+        return passengerMutex;
+    }
+
+    public Semaphore getDoorLock() {
+        return doorLock;
     }
 
     public Bus getCurrentBus() {
@@ -47,24 +74,5 @@ public class Station {
 
     public void setCurrentBus(Bus currentBus) {
         this.currentBus = currentBus;
-    }
-
-    public int getPassengerCount() {
-        passengerLock.acquireUninterruptibly();
-        int temp = passengerCount;
-        passengerLock.release();
-        return temp;
-    }
-
-    public void decrementPassengerCount() {
-        passengerLock.acquireUninterruptibly();
-        passengerCount -= 1;
-        passengerLock.release();
-    }
-
-    public void incrementPassengerCount() {
-        passengerLock.acquireUninterruptibly();
-        passengerCount += 1;
-        passengerLock.release();
     }
 }
