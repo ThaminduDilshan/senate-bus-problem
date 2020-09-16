@@ -1,3 +1,5 @@
+package constructs;
+
 import java.util.concurrent.Semaphore;
 
 public class Bus extends Thread {
@@ -16,25 +18,17 @@ public class Bus extends Thread {
 
     @Override
     public void run() {
-        while(true) {
-            if(station == null) {
-                System.out.println("No station found for the bus #" + busID);
-                break;
-            }
-            operate(station);
-
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if(station == null) {
+            System.out.println("[BUS] No station found for the bus #" + busID);
+        } else {
+            arrive(station);
         }
     }
 
-    public void operate(Station station) {
+    public void arrive(Station station) {
         station.getBoardMutex().acquireUninterruptibly();
 
-        System.out.println("Bus #" + busID + " arrived at the station!");
+        System.out.println("[BUS] Bus #" + busID + " arrived at the station !");
         station.setCurrentBus(this);
 
         if(station.getPassengerCount() != 0) {
@@ -48,7 +42,7 @@ public class Bus extends Thread {
     }
 
     public void depart(Station station) {
-        System.out.println("Bus #" + busID + " departed with " + passengerCount + " Passengers!");
+        System.out.println("[BUS] Bus #" + busID + " departed with " + passengerCount + " Passengers !");
     }
 
     public int getBusID() {

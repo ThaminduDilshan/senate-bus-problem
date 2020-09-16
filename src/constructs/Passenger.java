@@ -1,3 +1,5 @@
+package constructs;
+
 public class Passenger extends Thread {
     private int passengerID;
     private Station station;
@@ -9,18 +11,11 @@ public class Passenger extends Thread {
 
     @Override
     public void run() {
-        while(true) {
-            arrive(station);
-            try {
-                sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        arrive(station);
     }
 
     public void arrive(Station station) {
-        System.out.println("Passenger #" + passengerID + " arrived.");
+        System.out.println("[PASSENGER] Passenger #" + passengerID + " arrived.");
 
         // will be blocked if a bus is boarded
         station.getBoardMutex().acquireUninterruptibly();
@@ -33,7 +28,7 @@ public class Passenger extends Thread {
         station.incrementPassengerCount();
 
         // wait for the bus to arrive
-//        System.out.println("Passenger #" + passengerID + " waiting for the bus...");
+        // System.out.println("[PASSENGER] Passenger #" + passengerID + " waiting for the bus...");
         station.getBusMutex().acquireUninterruptibly();
 
         // board to the bus
@@ -51,7 +46,7 @@ public class Passenger extends Thread {
         Bus tempBus = station.getCurrentBus();
         station.decrementPassengerCount();
         tempBus.incrementPassengerCount();
-        System.out.println("Passenger #" + passengerID + " boarded to bus #" + tempBus.getBusID());
+        System.out.println("[PASSENGER] Passenger #" + passengerID + " boarded to bus #" + tempBus.getBusID());
     }
 
 }
