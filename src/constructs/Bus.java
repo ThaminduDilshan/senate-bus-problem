@@ -26,17 +26,24 @@ public class Bus extends Thread {
     }
 
     public void arrive(Station station) {
+        // prevent new passengers arriving at the waiting area
         station.getBoardMutex().acquireUninterruptibly();
 
         System.out.println("\u001B[34m[BUS]\u001B[0m Bus #" + busID + " arrived at the station !");
         station.setCurrentBus(this);
 
+        // if there are passengers waiting at the station
         if(station.getPassengerCount() != 0) {
+            // allow a waiting passenger to board to the bus
             station.getBusMutex().release();
+
+            // acquire the door lock preventing the bus leaving
             station.getDoorLock().acquireUninterruptibly();
         }
 
+        // allow new passengers to arrive to the waiting area
         station.getBoardMutex().release();
+
         depart(station);
 
     }

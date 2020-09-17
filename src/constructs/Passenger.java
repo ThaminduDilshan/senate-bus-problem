@@ -38,8 +38,10 @@ public class Passenger extends Thread {
         if(station.getPassengerCount() == 0) {
             station.getDoorLock().release();
         } else if(station.getCurrentBus().getPassengerCount() == station.getCurrentBus().getCapacity()) {
+            // release the door lock if the bus is full
             station.getDoorLock().release();
         } else {
+            // allow another passenger to board to the bus
             station.getBusMutex().release();
         }
     }
