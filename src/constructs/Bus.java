@@ -60,4 +60,12 @@ public class Bus extends Thread {
         }
         passengerCountMutex.release();
     }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public int getPassengerCount() {
+        return passengerCount;
+    }
 }

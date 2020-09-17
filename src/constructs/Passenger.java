@@ -37,6 +37,8 @@ public class Passenger extends Thread {
         // last passenger to board will release the door lock
         if(station.getPassengerCount() == 0) {
             station.getDoorLock().release();
+        } else if(station.getCurrentBus().getPassengerCount() == station.getCurrentBus().getCapacity()) {
+            station.getDoorLock().release();
         } else {
             station.getBusMutex().release();
         }
@@ -46,6 +48,7 @@ public class Passenger extends Thread {
         Bus tempBus = station.getCurrentBus();
         station.decrementPassengerCount();
         tempBus.incrementPassengerCount();
+        station.getBoardNextBusSemaphore().release();
         System.out.println("\u001B[32m[PASSENGER]\u001B[0m Passenger #" + passengerID + " boarded to bus #" + tempBus.getBusID());
     }
 
